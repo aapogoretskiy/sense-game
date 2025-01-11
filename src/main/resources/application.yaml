@@ -1,0 +1,20 @@
+spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    user: sense_username
+    password: sense_password
+  application:
+    name: sense-game
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sensegame
+    username: sense_username
+    password: sense_password
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+telegram:
+  bot:
+    name: SenseGameBot_bot
+    token: 7713024674:AAG4JJN9KIzKFkbWY4HnyIkmrUSQKZiZpow

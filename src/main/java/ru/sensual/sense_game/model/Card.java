@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Card {
+public class Card { //test
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

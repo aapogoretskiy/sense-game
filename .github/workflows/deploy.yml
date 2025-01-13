@@ -1,0 +1,30 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo -e "Host server\n\tStrictHostKeyChecking no\n\tHostName ${{ secrets.SERVER_IP }}\n\tUser ubuntu\n\tIdentityFile ~/.ssh/id_rsa" > ~/.ssh/config
+
+      - name: Deploy to Server
+        run: |
+          ssh 158.160.3.186 << 'EOF'
+          cd /home/aapogor8/sense-game
+          git pull origin develop
+          docker-compose down
+          docker-compose up --build -d
+          EOF

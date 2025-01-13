@@ -18,3 +18,8 @@ telegram:
   bot:
     name: SenseGameBot_bot
     token: 7713024674:AAG4JJN9KIzKFkbWY4HnyIkmrUSQKZiZpow
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

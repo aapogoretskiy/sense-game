@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import ru.sensual.sense_game.model.Card;
 import ru.sensual.sense_game.repository.CardRepository;
 
+import java.util.List;
 import java.util.Random;
 
 //@TODO существует проблема повторения карточек. Можно решить с помощью кэша и смотреть насколько давно карточка попадалась
@@ -17,12 +18,16 @@ public class CardService {
     private final CardRepository cardRepository;
     private final Random random = new Random();
 
-    public String getRandomCard() {
+    public List<Card> getAllCards() {
+        return cardRepository.findAll();
+    }
+
+    public Card getRandomCard() {
         var cards = cardRepository.findAll();
         if (CollectionUtils.isEmpty(cards)) {
-            return "Нет доступных карточек.";
+            return new Card(-1L, "Нет доступных карточек.", "NONE", -1);
         }
-        return cards.get(random.nextInt(cards.size())).getText();
+        return cards.get(random.nextInt(cards.size()));
     }
 
     public Card saveCard(Card card) {

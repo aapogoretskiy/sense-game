@@ -37,7 +37,7 @@ public class SenseGameBot extends TelegramLongPollingBot {
                 sendTextMessage(chatId, "Добро пожаловать в Sense Game! Используйте команду /get_card, чтобы получить карточку.");
             } else if (userMessage.equalsIgnoreCase("/get_card")) {
                 var card = cardService.getRandomCard();
-                sendTextMessage(chatId, "Вот ваша карточка: " + card);
+                sendTextMessage(chatId, "Вот ваша карточка: " + card.getText());
             } else {
                 sendTextMessage(chatId, "Неизвестная команда. Попробуйте /get_card.");
             }

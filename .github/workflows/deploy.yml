@@ -24,7 +24,7 @@ jobs:
     - name: Deploy to Server
       run: |
         ssh server << 'EOF'
-        cd /path/to/your/project
+        cd /home/aapogor8/sense-game
         git pull origin develop
         docker-compose down
         docker-compose up --build -d

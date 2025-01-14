@@ -26,6 +26,7 @@ jobs:
         ssh server << 'EOF'
         cd /home/aapogor8/sense-game
         git pull origin develop
+        mvn clean package
         sudo docker-compose down
         sudo docker-compose up --build -d
         EOF

@@ -19,7 +19,7 @@ jobs:
         echo "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-        echo -e "Host server\n\tHostName ${{ secrets.SERVER_IP }}\n\tUser <user>\n\tIdentityFile ~/.ssh/id_rsa" > ~/.ssh/config
+        echo -e "Host server\n\tHostName ${{ secrets.SERVER_IP }}\n\tUser aapogor8\n\tIdentityFile ~/.ssh/id_rsa" > ~/.ssh/config
 
     - name: Deploy to Server
       run: |

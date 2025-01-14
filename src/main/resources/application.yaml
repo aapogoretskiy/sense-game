@@ -23,3 +23,15 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /v3/api-docs
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    health:
+      show-details: always

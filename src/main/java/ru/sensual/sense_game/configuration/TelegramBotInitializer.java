@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.sensual.sense_game.telegram.SenseGameBot;
 
-@Slf4j(topic = "[TelegramBotInitializer]")
+@Slf4j
 @Component
 public class TelegramBotInitializer {
 

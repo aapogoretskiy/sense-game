@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.sensual.sense_game.configuration.TelegramBotConfig;
 import ru.sensual.sense_game.service.CardService;
 
-@Slf4j(topic = "[SenseGameBot]")
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SenseGameBot extends TelegramLongPollingBot {

@@ -2,6 +2,11 @@ version: '3.8'
 
 services:
   app:
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1.0"
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +14,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ParallelRefProcEnabled
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sensegame
       - SPRING_DATASOURCE_USERNAME=sense_username
       - SPRING_DATASOURCE_PASSWORD=sense_password
@@ -18,6 +24,7 @@ services:
       - monitoring_network
     volumes:
       - ./logs:/sense-game/logs
+    restart: always
 
   db:
     image: postgres:latest
@@ -32,6 +39,7 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - monitoring_network
+    restart: always
 
   prometheus:
     image: prom/prometheus:latest
@@ -42,6 +50,7 @@ services:
       - "9090:9090"
     networks:
       - monitoring_network
+    restart: always
 
   grafana:
     image: grafana/grafana:latest
@@ -52,20 +61,33 @@ services:
       - grafana-data:/var/lib/grafana
     networks:
       - monitoring_network
+    restart: always
 
   elasticsearch:
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1.5"
     image: docker.io/bitnami/elasticsearch:8.10.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx512m
     ports:
       - "9200:9200"
     volumes:
       - elasticsearch-data:/bitnami/elasticsearch/data
     networks:
       - monitoring_network
+    restart: always
 
   logstash:
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
     image: docker.io/bitnami/logstash:8.10.2
     container_name: logstash
     ports:
@@ -77,6 +99,7 @@ services:
       - elasticsearch
     networks:
       - monitoring_network
+    restart: always
 
   kibana:
     image: docker.io/bitnami/kibana:8.10.2
@@ -91,6 +114,7 @@ services:
       - elasticsearch
     networks:
       - monitoring_network
+    restart: always
 
 volumes:
   db-data:

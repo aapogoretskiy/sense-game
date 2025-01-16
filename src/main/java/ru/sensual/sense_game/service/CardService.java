@@ -20,7 +20,7 @@ import static ru.sensual.sense_game.model.type.UploadMessageType.NOTHING_LOADED;
 import static ru.sensual.sense_game.model.type.UploadMessageType.SUCCESS;
 
 //@TODO существует проблема повторения карточек. Можно решить с помощью кэша и смотреть насколько давно карточка попадалась
-@Slf4j(topic = "[CardService]")
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardService {

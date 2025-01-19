@@ -44,13 +44,14 @@ public class CardService {
      * @return случайная {@link Card}, если доступна; в противном случае, карточка с placeholder-значениями.
      */
     public Card getRandomCard() {
-        log.info("Receiving random card from database");
         var cards = cardRepository.findAll();
         if (CollectionUtils.isEmpty(cards)) {
             log.warn("Table with cards in database is empty. Nothing to return");
             return new Card(-1L, "Нет доступных карточек.", "NONE", -1);
         }
-        return cards.get(random.nextInt(cards.size()));
+        var card = cards.get(random.nextInt(cards.size()));
+        log.info("Received random card with text: [{}]", card.getText());
+        return card;
     }
 
     /**

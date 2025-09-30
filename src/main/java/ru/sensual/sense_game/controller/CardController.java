@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.sensual.sense_game.model.Card;
 import ru.sensual.sense_game.model.request.UploadCardRequest;
 import ru.sensual.sense_game.model.response.UploadCardsResponse;
@@ -17,7 +18,6 @@ import ru.sensual.sense_game.service.CardService;
 import java.util.List;
 
 import static ru.sensual.sense_game.constant.ExampleObject.UPLOAD_EXAMPLE_OBJECT;
-import static ru.sensual.sense_game.model.type.UploadMessageType.NOTHING_LOADED;
 
 @Slf4j
 @RestController
@@ -87,12 +87,12 @@ public class CardController {
             summary = "Загрузить карточки из Excel",
             description = "Позволяет загрузить карточки из Excel файла",
             responses = {
-                    @ApiResponse(responseCode = "501", description = "Функционал не реализован",
+                    @ApiResponse(responseCode = "200", description = "Карточки успешно обработаны",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = UploadCardsResponse.class)))
             }
     )
-    public UploadCardsResponse uploadCardsExcel(UploadCardsResponse uploadCardsResponse) {
-        return new UploadCardsResponse(NOTHING_LOADED, 0, 0); //@TODO нужно заимплементить
+    public UploadCardsResponse uploadCardsExcel(@RequestParam("file") MultipartFile file) {
+        return cardService.uploadCardsExcel(file);
     }
 }

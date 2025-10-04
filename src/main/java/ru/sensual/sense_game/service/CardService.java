@@ -14,11 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.sensual.sense_game.model.Card;
 import ru.sensual.sense_game.model.request.UploadCardRequest;
 import ru.sensual.sense_game.model.response.UploadCardsResponse;
+import ru.sensual.sense_game.model.type.CardCategory;
 import ru.sensual.sense_game.model.type.UploadMessageType;
 import ru.sensual.sense_game.repository.CardRepository;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,7 +57,7 @@ public class CardService {
         var cards = cardRepository.findAll();
         if (CollectionUtils.isEmpty(cards)) {
             log.warn("Table with cards in database is empty. Nothing to return");
-            return new Card(-1L, "Нет доступных карточек.", "NONE", -1);
+            return new Card(-1L, "Нет доступных карточек.", CardCategory.NONE, -1);
         }
         var card = cards.get(random.nextInt(cards.size()));
         log.info("Received random card with text: [{}]", card.getText());
@@ -126,16 +128,15 @@ public class CardService {
 
                 try {
                     String text = formatter.formatCellValue(row.getCell(0));
-                    String category = formatter.formatCellValue(row.getCell(1));
+                    Optional<CardCategory> cardCategory = CardCategory.from(formatter.formatCellValue(row.getCell(1)));
                     Integer difficulty = parseDifficulty(row, formatter);
 
-                    if (!StringUtils.hasText(text) || !StringUtils.hasText(category) || difficulty == null) {
+                    if (!StringUtils.hasText(text) || cardCategory.isEmpty() || difficulty == null) {
                         failCount.incrementAndGet();
                         log.warn("[Excel upload skipped] Row {} has invalid data", row.getRowNum());
                         continue;
                     }
-
-                    var card = new Card(null, text.trim(), category.trim(), difficulty);
+                    var card = new Card(null, text.trim(), cardCategory.get(), difficulty);
                     cardRepository.save(card);
                     successCount.incrementAndGet();
                     log.info("[Excel upload success] Card with text: [{}] saved", card.getText());

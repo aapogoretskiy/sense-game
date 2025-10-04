@@ -18,9 +18,12 @@ import ru.sensual.sense_game.model.type.UploadMessageType;
 import ru.sensual.sense_game.repository.CardRepository;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static ru.sensual.sense_game.model.type.UploadMessageType.FAILED;
 import static ru.sensual.sense_game.model.type.UploadMessageType.LOADED_WITH_FAILS;
@@ -52,12 +55,44 @@ public class CardService {
      * @return случайная {@link Card}, если доступна; в противном случае, карточка с placeholder-значениями.
      */
     public Card getRandomCard() {
+        return getRandomCard(new HashSet<>(), null, null, null);
+    }
+
+    /**
+     * Получает случайную карточку из репозитория с учётом фильтрации по категории и уровню сложности.
+     * Если карточки отсутствуют, возвращает карточку с дефолтными значениями.
+     *
+     * @param categories   список допустимых категорий. Если пустой, категории не фильтруются.
+     * @param minDifficulty минимально допустимый уровень сложности. {@code null}, если ограничение отсутствует.
+     * @param maxDifficulty максимально допустимый уровень сложности. {@code null}, если ограничение отсутствует.
+     * @param previousCard  предыдущая карточка для исключения повторов. {@code null}, если исключение не требуется.
+     * @return случайная {@link Card}, подходящая под условия фильтра, либо карточка с placeholder-значениями,
+     * если ничего не найдено.
+     */
+    public Card getRandomCard(Set<String> categories, Integer minDifficulty, Integer maxDifficulty, Card previousCard) {
         var cards = cardRepository.findAll();
         if (CollectionUtils.isEmpty(cards)) {
             log.warn("Table with cards in database is empty. Nothing to return");
             return new Card(-1L, "Нет доступных карточек.", "NONE", -1);
         }
-        var card = cards.get(random.nextInt(cards.size()));
+
+        var normalizedCategories = normalizeCategories(categories);
+        var filteredCards = cards.stream()
+                .filter(card -> filterByCategory(card, normalizedCategories))
+                .filter(card -> filterByDifficulty(card, minDifficulty, maxDifficulty))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(filteredCards)) {
+            log.warn("No cards were found for filters. Categories: {}, minDifficulty: {}, maxDifficulty: {}",
+                    normalizedCategories, minDifficulty, maxDifficulty);
+            return new Card(-1L, "Нет доступных карточек по заданным фильтрам.", "NONE", -1);
+        }
+
+        if (previousCard != null && filteredCards.size() > 1) {
+            filteredCards.removeIf(card -> previousCard.getId() != null && previousCard.getId().equals(card.getId()));
+        }
+
+        var card = filteredCards.get(random.nextInt(filteredCards.size()));
         log.info("Received random card with text: [{}]", card.getText());
         return card;
     }
@@ -189,6 +224,34 @@ public class CardService {
     private UploadMessageType getMessageType(int successCount, int failCount) {
         if (failCount == 0) return SUCCESS;
         return successCount != 0 ? LOADED_WITH_FAILS : FAILED;
+    }
+
+    private boolean filterByCategory(Card card, Set<String> normalizedCategories) {
+        if (CollectionUtils.isEmpty(normalizedCategories)) {
+            return true;
+        }
+        var cardCategory = StringUtils.hasText(card.getCategory()) ? card.getCategory().trim().toLowerCase() : "";
+        return normalizedCategories.contains(cardCategory);
+    }
+
+    private boolean filterByDifficulty(Card card, Integer minDifficulty, Integer maxDifficulty) {
+        if (minDifficulty != null && card.getDifficulty() < minDifficulty) {
+            return false;
+        }
+        if (maxDifficulty != null && card.getDifficulty() > maxDifficulty) {
+            return false;
+        }
+        return true;
+    }
+
+    private Set<String> normalizeCategories(Set<String> categories) {
+        if (CollectionUtils.isEmpty(categories)) {
+            return new HashSet<>();
+        }
+        return categories.stream()
+                .filter(StringUtils::hasText)
+                .map(value -> value.trim().toLowerCase())
+                .collect(Collectors.toSet());
     }
 
 }

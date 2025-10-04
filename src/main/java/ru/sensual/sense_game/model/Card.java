@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.sensual.sense_game.model.type.CardCategory;
 
 @Entity(name = "cards")
 @Getter
@@ -27,7 +28,7 @@ public class Card {
     private String text;
 
     @Schema(description = "Категория карточки", example = "Флирт")
-    private String category;
+    private CardCategory category;
 
     @Schema(description = "Уровень сложности карточки", example = "3")
     private int difficulty;
